@@ -13,18 +13,13 @@ def generateCsv():
     :return:
     """
 
-    fname = "data.csv"
-    file = open(fname, "wb")
+    with open('data.csv', 'w', newline='') as fp:
+        a = csv.writer(fp, delimiter=',')
 
-    try:
-        writer = csv.writer(file)
-
-#        for <chaque tweet>
-#            if tweet[n].startwith("RT"):
-#                type = "RT"
-#            else type = "T"
+        for <chaque tweet>
+            if tweet[n].startwith("RT"):
+                type = 'RT'
+            else type = 'T'
+            a.writerow(type,tweet.date)
 
 
-        writer.writerow(("type", "<DATE>"))
-
-    finally: file.close()
