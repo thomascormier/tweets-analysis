@@ -43,7 +43,7 @@ for status in tweepy.Cursor(api.home_timeline).items(50):
     print("nom du user : ", tweet['user']['name']) # name of the user, e.g. "Wei Xu"
     print("nom du compte ", tweet['user']['screen_name'], "\n") # name of the user account, e.g. "cocoweixu"-----------------------------------------------------------------
 
-followers = tweepy.API.followers("ThomasB72832506")
+#followers = tweepy.API.followers("ThomasB72832506")
 
 
 def getFollowers(idAccount):

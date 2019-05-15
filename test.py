@@ -70,15 +70,15 @@ print(ids)
 
 def getTweet(ids):
     for id in ids:
-        for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(id).screen_name).items(3):
+        for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(id).screen_name, tweet_mode='extended').items(3):
             print("screen name : "+api.get_user(id).screen_name);
             tweet = status._json
             print(setDateT(tweet['created_at']))  # when the tweet posted
-            print(tweet['text'])# content of the tweet
+            print(tweet['full_text'])# content of the tweet
             print('-----------------------------------------------------------------------------------------------\n')
 
 
-print(getTweet(ids))
+getTweet(ids)
 
 
 
