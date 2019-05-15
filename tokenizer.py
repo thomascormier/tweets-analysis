@@ -9,9 +9,9 @@ nltk.download('stopwords')
 #afin de donnée un poid d'intérêt au tweets
 #Dans notre cas nous travaillons avec agricool nous allons donc chercher des mots clefs en lien avec l'agriculture
 
-def tokenizer(str):
+def getTokens(str):
 
-    keyWords = {""}
+    keyWords = {"agriculture":10}
     words = word_tokenize(str)
 
     for w in words:

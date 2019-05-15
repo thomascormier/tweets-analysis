@@ -1,10 +1,15 @@
+import follower
+import tokenizer
+
 try:
     import json
 except ImportError:
     import simplejson as json
 
+
 import tweepy
 import logging
+import tweet
 logging.basicConfig()
 from datetime import datetime, timedelta
 
@@ -69,12 +74,20 @@ def setDateT(dateTweet):
 print(ids)
 
 def getTweet(ids):
+    listFollowers=[]
+    listTweets =[]
     for id in ids:
         for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(id).screen_name, tweet_mode='extended').items(3):
-            print("screen name : "+api.get_user(id).screen_name);
-            tweet = status._json
-            print(setDateT(tweet['created_at']))  # when the tweet posted
-            print(tweet['full_text'])# content of the tweet
+            print("screen name : "+api.get_user(id).screen_name)
+            tweetFeed = status._json
+            screen_name = api.get_user(id).screen_name
+            listFollowers.append(follower.Follower(id,screen_name))
+            date = setDateT(tweetFeed['created_at'])
+            content = tweetFeed['full_text']
+            weight = tokenizer.getTokens(content)
+            listTweets.append(tweet.Tweet(date, content,weight))
+            print(setDateT(tweetFeed['created_at']))  # when the tweet posted
+            print(tweetFeed['full_text'])# content of the tweet
             print('-----------------------------------------------------------------------------------------------\n')
 
 
