@@ -73,25 +73,46 @@ def setDateT(dateTweet):
 
 print(ids)
 
+def indexFollower(listFollowers, id) :
+    res={}
+    for i in range(len(listFollowers)):  # check if the follower is already in the list
+        if listFollowers[i].idF == id:
+            res={False:i}
+            return res
+    res={True:len(listFollowers)}
+    return res
+
 def getTweet(ids):
     listFollowers=[]
     listTweets =[]
-    for id in ids:
-        for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(id).screen_name, tweet_mode='extended').items(3):
-            print("screen name : "+api.get_user(id).screen_name)
+    for i in range(len(ids)):
+        for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name, tweet_mode='extended').items(3):
             tweetFeed = status._json
-            screen_name = api.get_user(id).screen_name
-            listFollowers.append(follower.Follower(id,screen_name))
-            date = setDateT(tweetFeed['created_at'])
-            content = tweetFeed['full_text']
-            weight = tokenizer.getTokens(content)
-            listTweets.append(tweet.Tweet(date, content,weight))
-            print(setDateT(tweetFeed['created_at']))  # when the tweet posted
-            print(tweetFeed['full_text'])# content of the tweet
-            print('-----------------------------------------------------------------------------------------------\n')
+
+            date = setDateT(tweetFeed['created_at']) # when the tweet posted
+            content = tweetFeed['full_text'] # content of the tweet
+            screen_name = api.get_user(ids[i]).screen_name
+            res=indexFollower(listFollowers,ids[i])
+            if next(iter(res)) :
+                listFollowers.append(follower.Follower(ids[i],screen_name))
+                listFollowers[res[True]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
+            else:
+                listFollowers[res[False]].addTweet(tweet.Tweet(date, content,tokenizer.getWeight(content)))
+
+    return listFollowers
+
+listFollowers = getTweet(ids)
+
+for follower in listFollowers:
+    print(follower.screen_name)
+    for tweet in follower.listTweets :
+        print(tweet.date)
+        print(tweet.content)
+        print(tweet.weight)
+        print('-----------------------------------------------------------------------------------------------\n')
+    print("=====================================================================================================\n")
 
 
-print("toto")
 
 
 

@@ -1,5 +1,5 @@
 class Tweet:
-    def __init__(self, date, text, poids):
+    def __init__(self, date, content, weight):
         self.date = date
-        self.text = text
-        self.poids = poids
+        self.content = content
+        self.weight = weight
