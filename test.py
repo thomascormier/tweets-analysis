@@ -46,7 +46,7 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True, 
 
 def getFollowers(idAccount):
     list=[]
-    for status in tweepy.Cursor(api.followers_ids, id = idAccount).items(5):
+    for status in tweepy.Cursor(api.followers_ids, id = idAccount).items(1):
         list.append(status)
     return list
 
@@ -86,7 +86,7 @@ def getTweet(ids):
     listFollowers=[]
     listTweets =[]
     for i in range(len(ids)):
-        for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name, tweet_mode='extended').items(3):
+        for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name, tweet_mode='extended').items(1):
             tweetFeed = status._json
 
             date = setDateT(tweetFeed['created_at']) # when the tweet posted

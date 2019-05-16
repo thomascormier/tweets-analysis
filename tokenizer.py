@@ -5,9 +5,21 @@
 
 def getWeight(content):
 
-    keyWords = {"agriculture":10,"Si":12,"en":4}
+    keyWords = {"#agrifood":10,"@_agricool":10,"agriculture":9,"écologie":9,"écosystème":10,"press":4,"manger":6,"pesticide":8,"eat":6,
+                "fruit":6,"légume":6,"strawberrie":5,"fraise":5,"framboise":5,"tasty":1,"goûtue":1,"décilicieux":1,"healthy":5,"sain":5,"ecofriendly:6,"
+                "l'agriculture":9,"culture":4,"climate":6,"futur":5,"pollution":5,"world":7}
     weight = 0
-    for w in content.split():
-        if w in keyWords:
-            weight+=keyWords[w]
+    i=0
+    #for w in content.lower().split():#s'assurer que tout est en minuscule
+    #    if w in keyWords :
+    #        weight+=keyWords[w]
+    #    if w[:-1] in keyWords: #pour le pluriel
+    #        weight+=keyWords[w[:-1]]
+    for w in content.lower().split():  # s'assurer que tout est en minuscule
+        for value in keyWords:
+            tempvalue=value[:4]
+            k=w
+            s=1
+            if w.startswith(tempvalue):
+                weight += keyWords[value]
     return weight
