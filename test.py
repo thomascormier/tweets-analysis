@@ -1,12 +1,10 @@
 import follower
 import tokenizer
-
+import csv
 try:
     import json
 except ImportError:
     import simplejson as json
-
-
 import tweepy
 import logging
 import tweet
@@ -44,14 +42,23 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True, 
 #---------------------------------------------------------------------------------------------------------------------
 
 
-def getFollowers(idAccount):
+def getNbFollowers(idAccount,nbFollowersToGet):
+    """
+
+    :param idAccount: La compte dont on souhaite récupérer les followers
+    :return: Une liste des followers d'un compte
+    """
     list=[]
-    for status in tweepy.Cursor(api.followers_ids, id = idAccount).items(1):
+    for status in tweepy.Cursor(api.followers_ids, id = idAccount).items(nbFollowersToGet):
         list.append(status)
     return list
 
 
-ids=getFollowers("_agricool")
+ids = getNbFollowers("_agricool",2)
+
+print("============ID des followers récupérés============\n",ids )
+
+
 
 """
 listTest=[]
@@ -71,7 +78,7 @@ def setDateT(dateTweet):
     d = d + timedelta(hours=1)
     return d
 
-print(ids)
+
 
 def indexFollower(listFollowers, id) :
     res={}
@@ -82,11 +89,10 @@ def indexFollower(listFollowers, id) :
     res={True:len(listFollowers)}
     return res
 
-def getTweet(ids):
+def getlistFollowers(ids):
     listFollowers=[]
-    listTweets =[]
     for i in range(len(ids)):
-        for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name, tweet_mode='extended').items(1):
+        for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name, tweet_mode='extended').items(2):
             tweetFeed = status._json
 
             date = setDateT(tweetFeed['created_at']) # when the tweet posted
@@ -101,28 +107,29 @@ def getTweet(ids):
 
     return listFollowers
 
-listFollowers = getTweet(ids)
+listFollowers = getlistFollowers(ids)
 
-for follower in listFollowers:
-    print(follower.screen_name)
-    for tweet in follower.listTweets :
-        print(tweet.date)
-        print(tweet.content)
-        print(tweet.weight)
-        print('-----------------------------------------------------------------------------------------------\n')
-    print("=====================================================================================================\n")
+"""
+data=[]
+with open('data.csv', 'w', newline='') as fp:
+    a = csv.writer(fp, delimiter=',')
 
+    for follower in listFollowers:
+        print(follower.screen_name)
+        for tweet in follower.listTweets :
 
+            if tweet.content.startswith("RT"):
+                type = 'RT'
+            else : type = 'T'
+            data.append([type,str(tweet.date)])
 
+            print(tweet.date)
+            print(tweet.content)
+            print(tweet.weight)
+            print('-----------------------------------------------------------------------------------------------\n')
 
-
-#def getTweetDate(tweet)
-
-#def getTweetType(tweet)
-
-
-
-
-
-
+        print("=====================================================================================================\n")
+    a.writerows(data)
+    print(data)
+"""
 
