@@ -18,8 +18,8 @@ ACCESS_TOKEN = '6895181-SqAfibTTTPj426Njs5DoZPw4WOtkDeghHF9cHu8IM'
 ACCESS_SECRET = 'TDSNRDwsmHVxVISOpowpADB6f3SnvAu6eOcLg7PGlwDjn'
 CONSUMER_KEY = 'qFBm7PP8yvBO87EuvGCmQ'
 CONSUMER_SECRET = 'UrVAZEPoFtcFNh20ilEae18yjQ2MdnH44Dz2wtpsKk'
-
 """
+
 ACCESS_TOKEN = '1092775756990742528-f3jdO4dHk6mz74xelnaIR5DanAWPm6'
 ACCESS_SECRET = 'ajiXNmSln042ivtOOTh9GYkh0vcJNZwiQAmZMuf6sRCtB'
 CONSUMER_KEY = 'nazYTA9BgmjpZSB54whfr4gkF'
@@ -44,7 +44,6 @@ api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True, 
 
 def getNbFollowers(idAccount,nbFollowersToGet):
     """
-
     :param idAccount: La compte dont on souhaite récupérer les followers
     :return: Une liste des followers d'un compte
     """
@@ -53,10 +52,10 @@ def getNbFollowers(idAccount,nbFollowersToGet):
         list.append(status)
     return list
 
-
 ids = getNbFollowers("_agricool",2)
 
 print("============ID des followers récupérés============\n",ids )
+
 
 
 
@@ -82,8 +81,8 @@ def setDateT(dateTweet):
 
 def indexFollower(listFollowers, id) :
     res={}
-    for i in range(len(listFollowers)):  # check if the follower is already in the list
-        if listFollowers[i].idF == id:
+    for i in range(len(listFollowers)):
+        if listFollowers[i].idF == id: # check if the follower is already in the list
             res={False:i}
             return res
     res={True:len(listFollowers)}
@@ -92,9 +91,10 @@ def indexFollower(listFollowers, id) :
 def getlistFollowers(ids):
     listFollowers=[]
     for i in range(len(ids)):
+    # Pour chaque follower sélectionné
         for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name, tweet_mode='extended').items(2):
+            # On parcoure ces 2 derniers tweets pour récupérer les infos suivantes :
             tweetFeed = status._json
-
             date = setDateT(tweetFeed['created_at']) # when the tweet posted
             content = tweetFeed['full_text'] # content of the tweet
             screen_name = api.get_user(ids[i]).screen_name
@@ -109,27 +109,30 @@ def getlistFollowers(ids):
 
 listFollowers = getlistFollowers(ids)
 
-"""
+
 data=[]
 with open('data.csv', 'w', newline='') as fp:
     a = csv.writer(fp, delimiter=',')
 
     for follower in listFollowers:
-        print(follower.screen_name)
-        for tweet in follower.listTweets :
 
+
+        #print(follower.screen_name)
+        for tweet in follower.listTweets :
             if tweet.content.startswith("RT"):
                 type = 'RT'
             else : type = 'T'
-            data.append([type,str(tweet.date)])
+            #data.append([type,str(tweet.date)])
 
-            print(tweet.date)
-            print(tweet.content)
-            print(tweet.weight)
-            print('-----------------------------------------------------------------------------------------------\n')
 
-        print("=====================================================================================================\n")
-    a.writerows(data)
-    print(data)
-"""
+            #print(tweet.date)
+            #print(tweet.content)
+            #print(tweet.weight)
+            #print('-----------------------------------------------------------------------------------------------\n')
+
+        #print("=====================================================================================================\n")
+
+a.writerows(data)
+
+print(data)
 

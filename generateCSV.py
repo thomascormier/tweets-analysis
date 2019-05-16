@@ -9,7 +9,7 @@ with open('tweetdata.csv','w',newline='') as fp:
             ['date4', 'T']]
     a.writerows(data)
 
-def generate():
+def createCSV():
     """
     On doit recuperer les tweets un par un.
     On parcours l ensemble des tweets un par un.
@@ -22,9 +22,10 @@ def generate():
 
     with open('data.csv', 'w', newline='') as fp:
         a = csv.writer(fp, delimiter=',')
-
+        """
         for <chaque tweet>
             if tweet[n].startwith("RT"):
                 type = 'RT'
             else type = 'T'
             a.writerow(type,tweet.date)
+        """
