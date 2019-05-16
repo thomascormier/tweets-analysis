@@ -6,4 +6,3 @@ class Follower :
 
     def addTweet(self,tweet):
         self.listTweets.append(tweet)
-

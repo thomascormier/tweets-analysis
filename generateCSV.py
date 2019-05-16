@@ -1,8 +1,15 @@
 # coding=utf-8
 import csv
 
+with open('tweetdata.csv','w',newline='') as fp:
+    a = csv.writer(fp, delimiter=',')
+    data = [['date1', 'T'],
+            ['date2', 'RT'],
+            ['date3', 'RT'],
+            ['date4', 'T']]
+    a.writerows(data)
 
-def generateCsv():
+def generate():
     """
     On doit recuperer les tweets un par un.
     On parcours l ensemble des tweets un par un.
@@ -21,5 +28,3 @@ def generateCsv():
                 type = 'RT'
             else type = 'T'
             a.writerow(type,tweet.date)
-
-
