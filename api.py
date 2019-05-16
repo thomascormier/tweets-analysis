@@ -31,7 +31,7 @@ class API :
     def __init__(self,idAccount):
         self.idAccount = idAccount
         self.FollowersIDs = self.getFollowersIDs(idAccount)
-
+        self.listFollowers = self.getlistFollowers()
 
     def getFollowersIDs(self, idAccount):
         """
@@ -42,6 +42,41 @@ class API :
         for ids in tweepy.Cursor(api.followers_ids, id=idAccount).items(2):
             listIDs.append(ids)
         return listIDs
+
+    def getlistFollowers(self):
+        ids = self.FollowersIDs
+        listFollowers = []
+        for i in range(len(ids)):
+            # Pour chaque follower sélectionné
+            for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name,tweet_mode='extended').items(2):
+                # On parcoure ces 2 derniers tweets pour récupérer les infos suivantes :
+                soloTweet = status._json
+                date = self.setDateT(soloTweet['created_at'])  # On calcule et on stocke la date du tweet
+                content = soloTweet['full_text']  # On stocke le contenu du tweet
+                screen_name = api.get_user(ids[i]).screen_name # On stocke le screen_name de propriétaire du tweet
+                res = self.indexFollower(listFollowers, ids[i])
+
+                if next(iter(res)):
+                    # Si on ne connait pas le follower :
+                    listFollowers.append(follower.Follower(ids[i], screen_name))
+                    # On crée et on ajoute le follower
+                    listFollowers[res[True]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
+                    # On crée et on ajoute le tweet
+                else:
+                    # Si on connait pas follower :
+                    listFollowers[res[False]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
+                    # On crée et on ajoute le tweet
+
+        return listFollowers
+
+    def indexFollower(self,listFollowers, id):
+        #res = {}
+        for i in range(len(listFollowers)):
+            if listFollowers[i].idF == id:  # check if the follower is already in the list
+                res = {False: i}
+                return res
+        res = {True: len(listFollowers)}
+        return res
 
     def setDateT(self,dateTweet):
         monthsDic = {"Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06", "Jul": "07", "Aug": "08",
@@ -54,40 +89,10 @@ class API :
         d = d + timedelta(hours=1)
         return d
 
-    def indexFollower(self,listFollowers, id):
-        res = {}
-        for i in range(len(listFollowers)):
-            if listFollowers[i].idF == id:  # check if the follower is already in the list
-                res = {False: i}
-                return res
-        res = {True: len(listFollowers)}
-        return res
-
-    def getlistFollowers(self,ids):
-        listFollowers = []
-        for i in range(len(ids)):
-            # Pour chaque follower sélectionné
-            for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name,tweet_mode='extended').items(2):
-                # On parcoure ces 2 derniers tweets pour récupérer les infos suivantes :
-
-                tweetFeed = status._json
-                date = self.setDateT(tweetFeed['created_at'])  # when the tweet posted
-                content = tweetFeed['full_text']  # content of the tweet
-                screen_name = api.get_user(ids[i]).screen_name
-                res = self.indexFollower(listFollowers, ids[i])
-
-                if next(iter(res)):
-                    listFollowers.append(follower.Follower(ids[i], screen_name))
-                    listFollowers[res[True]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
-                else:
-                    listFollowers[res[False]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
-
-        return listFollowers
 
 
-twitterAPI = API("_agricool")
-companyFollowerIDs = twitterAPI.FollowersIDs
 
-print("============ID des followers récupérés============\n", companyFollowerIDs)
 
-listFollowers = twitterAPI.getlistFollowers(companyFollowerIDs)
+#print("============ID des followers récupérés============\n", companyFollowerIDs)
+
+#listFollowers = twitterAPI.getlistFollowers(companyFollowerIDs)

@@ -1,4 +1,4 @@
-import api
+from api import API
 
 import mysql.connector
 
@@ -11,10 +11,12 @@ mydb = mysql.connector.connect(
 mycursor = mydb.cursor()
 
 
+
 class DataBase :
     def __init__(self):
         self.listFollowers = []
         self.listTweets = []
+        self.api = API("_agricool")
 
     def buildDB(self):
         self.createDB()
@@ -54,7 +56,7 @@ class DataBase :
         Parcous leurs tweets respectifs et les ajoute à la DB
         :return:
         """
-        for follower in listFollowers:
+        for follower in self.api.listFollowers:
             follower.fillFollowerInDB()
             self.listFollowers.append(follower)
             for tweet in follower.listTweets:
@@ -79,4 +81,4 @@ class DataBase :
 
 
 mydb = DataBase()
-mydb.buildDB() # Constuit la DataBase
+mydb.createDB() # Constuit la DataBase
