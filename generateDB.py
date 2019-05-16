@@ -103,53 +103,68 @@ def getlistFollowers(ids):
 listFollowers = getlistFollowers(ids)
 
 
-data = []
-with open('data.csv', 'w', newline='') as fp:
-    a = csv.writer(fp, delimiter=',')
 
-    for follower in listFollowers:
-        fillFollowerInDB()
+class DataBase :
 
-        for tweet in follower.listTweets:
-            tweet.getTweetType()
+    def createDB(self):
+        self.generateDB()
+        self.fillDB()
 
 
+    def generateDB(self):
+        """
+        Delete the entire database and create a new empty one
+        """
+        mycursor.execute("DROP TABLE tweet")
+        mycursor.execute("DROP TABLE follower")
+
+        createFollowerTable = "CREATE TABLE follower (" \
+                                "idF VARCHAR(255)," \
+                                "screen_name varchar(255)," \
+                                "weight int(10)," \
+                                "PRIMARY KEY(idF)" \
+                              ")"
+
+        createTweetTable = "CREATE TABLE tweet (" \
+                            "idT VARCHAR(255)," \
+                            "idF VARCHAR(255)," \
+                            "type VARCHAR(255)," \
+                            "content VARCHAR(140)," \
+                            "weight INTEGER(10)," \
+                            "PRIMARY KEY(idT)," \
+                            "FOREIGN KEY (idF) REFERENCES follower(idF)" \
+                           ")"
+
+        mycursor.execute(createFollowerTable)
+        mycursor.execute(createTweetTable)
+
+    def fillDB(self):
+        """
+        Parcours les followers récupérés un par un et les ajoute à la DB puis
+        Parcous leurs tweets respectifs et les ajoute à la DB
+        :return:
+        """
+        for follower in listFollowers:
+            follower.fillFollowerInDB()
+            for tweet in follower.listTweets:
+                tweet.fillTweetInDB()
+
+    def fillFollowerInDB(self):
+        """
+        Insert a Follower into the database
+        """
+        sqlInsertFollowers = "INSERT INTO follower screen_name VALUES %s"
+        mycursor.execute(sqlInsertFollowers,self.screen_name)
+        mydb.commit()
 
 
-a.writerows(data)
 
-print(data)
-
-
-
-
-
-
-
-def getTweetType(self):
-    if self.content.startswith("RT"):
-        return 'RT'
-    else:
-        return 'T'
+    def fillTweetInDB(self):
+        """
+        Insert a Tweet into the database
+        """
+        sqlInsertTweets = "INSERT INTO tweet content VALUES %s"
+        mycursor.executemany(sqlInsertTweets,self.content)
+        mydb.commit()
 
 
-def createDB():
-    """
-    Delete the entire database and create a new empty one
-    """
-    mycursor.execute("DROP TABLE tweet")
-    mycursor.execute("DROP TABLE follower")
-    mycursor.execute("CREATE TABLE follower (idF VARCHAR(255), screen_name varchar(255), weight int(10),PRIMARY KEY(idF))")
-    mycursor.execute("CREATE TABLE tweet (idT VARCHAR(255),idF VARCHAR(255), type VARCHAR(255), content VARCHAR(140),weight INTEGER(10),PRIMARY KEY(idT), FOREIGN KEY (idF) REFERENCES follower(idF))")
-
-
-def fillFollowerInDB(self):
-    sqlInsertFollowers = "INSERT INTO follower screen_name VALUES %s"
-    mycursor.execute(sqlInsertFollowers,self.screen_name)
-    mydb.commit()
-
-
-def fillTweetInDB(self):
-    sqlInsertTweets = "INSERT INTO tweet content VALUES %s"
-    mycursor.executemany(sqlInsertTweets,self.content)
-    mydb.commit()
