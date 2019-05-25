@@ -4,6 +4,8 @@ import tweet
 
 import tweepy
 import logging
+import csv
+import time
 
 try:
     import json
@@ -39,7 +41,7 @@ class API :
         :return: Une liste des followers d'un compte
         """
         listIDs = []
-        for ids in tweepy.Cursor(api.followers_ids, id=idAccount).items(2):
+        for ids in tweepy.Cursor(api.followers_ids, id=idAccount).items(5):
             listIDs.append(ids)
         return listIDs
 
@@ -48,7 +50,7 @@ class API :
         listFollowers = []
         for i in range(len(ids)):
             # Pour chaque follower sélectionné
-            for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name,tweet_mode='extended').items(2):
+            for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name,tweet_mode='extended').items(3):
                 # On parcoure ces 2 derniers tweets pour récupérer les infos suivantes :
                 soloTweet = status._json
                 date = self.setDateT(soloTweet['created_at'])  # On calcule et on stocke la date du tweet
@@ -90,9 +92,61 @@ class API :
         return d
 
 
+TwitterAPI = API("_agricool")
+
+class CSVFile:
 
 
+    def writeBasicCSV(self):
+        data = []
+        with open('BasicData.csv', 'w', newline='') as fp:
+            a = csv.writer(fp, delimiter=',')
+            for follower in TwitterAPI.listFollowers:
+                for tweet in follower.listTweets:
+                    if tweet.content.startswith("RT"):
+                        type = 'RT'
+                    else:
+                        type = 'T'
+                    data.append([type, str(tweet.date)])
+            a.writerows(data)
+            print(data)
+            fp.close
 
-#print("============ID des followers récupérés============\n", companyFollowerIDs)
+    def writeFollowerCSV(self):
+        data = []
+        with open('ListFollowers.csv', 'w', newline='') as fp:
+            a = csv.writer(fp, delimiter=',')
+            for follower in TwitterAPI.listFollowers:
+                data.append([follower.screen_name])
+                time.sleep(0.2)
+            a.writerows(data)
+            print(data)
+            fp.close
 
-#listFollowers = twitterAPI.getlistFollowers(companyFollowerIDs)
+    def writeTweetCSV(self):
+        data = []
+        with open('ListTweets.csv', 'w', newline='') as fp:
+            a = csv.writer(fp, delimiter=',')
+            for follower in TwitterAPI.listFollowers:
+                for tweet in follower.listTweets:
+                    if tweet.content.startswith("RT"):
+                        type = 'RT'
+                    else:
+                        type = 'T'
+                    data.append([follower.screen_name,type, str(tweet.date)])
+            a.writerows(data)
+            print(data)
+            fp.close
+
+#############################################EXECUTION#############################################
+
+
+BasicCSV = CSVFile()
+#BasicCSV.writeBasicCSV()
+
+
+FollowerdataCSV = CSVFile()
+FollowerdataCSV.writeFollowerCSV()
+
+TweetdataCSV = CSVFile()
+#TweetdataCSV.writeTweetCSV()

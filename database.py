@@ -1,5 +1,4 @@
 from api import API
-
 import mysql.connector
 
 mydb = mysql.connector.connect(
@@ -17,6 +16,8 @@ class DataBase :
         self.listFollowers = []
         self.listTweets = []
         self.api = API("_agricool")
+        self.mycursor = mydb.cursor()
+
 
     def buildDB(self):
         self.createDB()
@@ -26,8 +27,12 @@ class DataBase :
         """
         Delete the entire database and create a new empty one
         """
+
+
         mycursor.execute("DROP TABLE tweet")
         mycursor.execute("DROP TABLE follower")
+
+        mycursor.commit()
 
         createFollowerTable = "CREATE TABLE follower (" \
                                 "idF VARCHAR(255)," \
@@ -48,6 +53,8 @@ class DataBase :
 
         mycursor.execute(createFollowerTable)
         mycursor.execute(createTweetTable)
+
+        mydb.commit()
 
     #TODO : récupérer la ListFollowers
     def fillDB(self):
