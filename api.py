@@ -45,46 +45,34 @@ class API :
         :param idAccount: La compte dont on souhaite récupérer les followers
         :return: Une liste des followers d'un compte
         """
-        #listIDs = []
-        #for ids in tweepy.Cursor(api.followers_ids, id=idAccount).items(15):
-        #    listIDs.append(ids)
-        #return listIDs
-        followers = []
-        for page in tweepy.Cursor(api.followers_ids, screen_name=idAccount, wait_on_rate_limit=True, count=200).pages():
-            try:
-                followers.extend(page)
-            except tweepy.TweepError as e:
-                print("Going to sleep:", e)
-                time.sleep(60)
-        return followers
+        listIDs = []
+        for ids in tweepy.Cursor(api.followers_ids, id=idAccount).items(0):
+            listIDs.append(ids)
+        return listIDs
 
     def getlistFollowers(self):
         ids = self.FollowersIDs
         listFollowers = []
         for i in range(len(ids)):
             # Pour chaque follower sélectionné
-            for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name,tweet_mode='extended').items(1):
+            for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name,tweet_mode='extended').items(0):
                 # On parcoure ces 2 derniers tweets pour récupérer les infos suivantes :
-                try :
-                    soloTweet = status._json
-                    date = self.setDateT(soloTweet['created_at'])  # On calcule et on stocke la date du tweet
-                    content = soloTweet['full_text']  # On stocke le contenu du tweet
-                    screen_name = api.get_user(ids[i]).screen_name # On stocke le screen_name de propriétaire du tweet
-                    res = self.indexFollower(listFollowers, ids[i])
+                soloTweet = status._json
+                date = self.setDateT(soloTweet['created_at'])  # On calcule et on stocke la date du tweet
+                content = soloTweet['full_text']  # On stocke le contenu du tweet
+                screen_name = api.get_user(ids[i]).screen_name # On stocke le screen_name de propriétaire du tweet
+                res = self.indexFollower(listFollowers, ids[i])
 
-                    if next(iter(res)):
-                        # Si on ne connait pas le follower :
-                        listFollowers.append(follower.Follower(ids[i], screen_name))
-                        # On crée et on ajoute le follower
-                        listFollowers[res[True]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
-                        # On crée et on ajoute le tweet
-                    else:
-                        # Si on connait pas follower :
-                        listFollowers[res[False]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
-                        # On crée et on ajoute le tweet
-                except tweepy.TweepError as e:
-                    print("Going to sleep:", e)
-                    time.sleep(60)
+                if next(iter(res)):
+                    # Si on ne connait pas le follower :
+                    listFollowers.append(follower.Follower(ids[i], screen_name))
+                    # On crée et on ajoute le follower
+                    listFollowers[res[True]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
+                    # On crée et on ajoute le tweet
+                else:
+                    # Si on connait pas follower :
+                    listFollowers[res[False]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
+                    # On crée et on ajoute le tweet
 
         return listFollowers
 
@@ -108,8 +96,9 @@ class API :
         d = d + timedelta(hours=1)
         return d
 
+#TwitterAPI = API("_agricool")
 
-TwitterAPI = API("_agricool")
+##########################################################################################
 
 class CSVFile:
 
@@ -157,15 +146,15 @@ class CSVFile:
             print(data)
             fp.close
 
-#############################################EXECUTION#############################################
-
-
 #BasicCSV = CSVFile()
 #BasicCSV.writeBasicCSV()
 
-
-FollowerdataCSV = CSVFile()
-FollowerdataCSV.writeFollowerCSV()
+#FollowerdataCSV = CSVFile()
+#FollowerdataCSV.writeFollowerCSV()
 
 #TweetdataCSV = CSVFile()
 #TweetdataCSV.writeTweetCSV()
+
+##########################################################################################
+
+
