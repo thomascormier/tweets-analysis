@@ -41,7 +41,7 @@ class API :
         :return: Une liste des followers d'un compte
         """
         listIDs = []
-        for ids in tweepy.Cursor(api.followers_ids, id=idAccount).items(15):
+        for ids in tweepy.Cursor(api.followers_ids, id=idAccount).items(0):
             listIDs.append(ids)
         return listIDs
 
@@ -50,7 +50,7 @@ class API :
         listFollowers = []
         for i in range(len(ids)):
             # Pour chaque follower sélectionné
-            for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name,tweet_mode='extended').items(1):
+            for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name,tweet_mode='extended').items(0):
                 # On parcoure ces 2 derniers tweets pour récupérer les infos suivantes :
                 soloTweet = status._json
                 date = self.setDateT(soloTweet['created_at'])  # On calcule et on stocke la date du tweet
@@ -91,12 +91,11 @@ class API :
         d = d + timedelta(hours=1)
         return d
 
+#TwitterAPI = API("_agricool")
 
-TwitterAPI = API("_agricool")
+##########################################################################################
 
 class CSVFile:
-
-
     def writeBasicCSV(self):
         data = []
         with open('BasicData.csv', 'w', newline='') as fp:
@@ -140,15 +139,15 @@ class CSVFile:
             print(data)
             fp.close
 
-#############################################EXECUTION#############################################
-
-
 #BasicCSV = CSVFile()
 #BasicCSV.writeBasicCSV()
 
-
-FollowerdataCSV = CSVFile()
-FollowerdataCSV.writeFollowerCSV()
+#FollowerdataCSV = CSVFile()
+#FollowerdataCSV.writeFollowerCSV()
 
 #TweetdataCSV = CSVFile()
 #TweetdataCSV.writeTweetCSV()
+
+##########################################################################################
+
+
