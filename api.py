@@ -17,10 +17,15 @@ from datetime import datetime, timedelta
 
 ######################################API SETTINGS########################################
 
-ACCESS_TOKEN = '1092775756990742528-f3jdO4dHk6mz74xelnaIR5DanAWPm6'
-ACCESS_SECRET = 'ajiXNmSln042ivtOOTh9GYkh0vcJNZwiQAmZMuf6sRCtB'
-CONSUMER_KEY = 'nazYTA9BgmjpZSB54whfr4gkF'
-CONSUMER_SECRET = 'zOm049TtpKJ4zc36gqD3XV8xl4SYSvQJCz1AygEbDK0BVt5v37'
+#ACCESS_TOKEN = '1092775756990742528-f3jdO4dHk6mz74xelnaIR5DanAWPm6'
+#ACCESS_SECRET = 'ajiXNmSln042ivtOOTh9GYkh0vcJNZwiQAmZMuf6sRCtB'
+#CONSUMER_KEY = 'nazYTA9BgmjpZSB54whfr4gkF'
+#CONSUMER_SECRET = 'zOm049TtpKJ4zc36gqD3XV8xl4SYSvQJCz1AygEbDK0BVt5v37'
+
+ACCESS_TOKEN = '818456674507902977-CweXH1SJkOeyKLAc1EUnZ2JKSHpC83Z'
+ACCESS_SECRET = "kLla8weNLy1tfEdwEIlUmz9g1tV91sO7VHE5dOhyrYLsL"
+CONSUMER_KEY = "cZQqU0bI8Du4OAr3vqZFGH17C"
+CONSUMER_SECRET = "JuFRZeTaWVG48GYALBRDuaJHJr5LQVqBsFyDyyDxaUVYhu0rMz"
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
@@ -40,10 +45,18 @@ class API :
         :param idAccount: La compte dont on souhaite récupérer les followers
         :return: Une liste des followers d'un compte
         """
-        listIDs = []
-        for ids in tweepy.Cursor(api.followers_ids, id=idAccount).items(15):
-            listIDs.append(ids)
-        return listIDs
+        #listIDs = []
+        #for ids in tweepy.Cursor(api.followers_ids, id=idAccount).items(15):
+        #    listIDs.append(ids)
+        #return listIDs
+        followers = []
+        for page in tweepy.Cursor(api.followers_ids, screen_name=idAccount, wait_on_rate_limit=True, count=200).pages():
+            try:
+                followers.extend(page)
+            except tweepy.TweepError as e:
+                print("Going to sleep:", e)
+                time.sleep(60)
+        return followers
 
     def getlistFollowers(self):
         ids = self.FollowersIDs
@@ -52,22 +65,26 @@ class API :
             # Pour chaque follower sélectionné
             for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name,tweet_mode='extended').items(1):
                 # On parcoure ces 2 derniers tweets pour récupérer les infos suivantes :
-                soloTweet = status._json
-                date = self.setDateT(soloTweet['created_at'])  # On calcule et on stocke la date du tweet
-                content = soloTweet['full_text']  # On stocke le contenu du tweet
-                screen_name = api.get_user(ids[i]).screen_name # On stocke le screen_name de propriétaire du tweet
-                res = self.indexFollower(listFollowers, ids[i])
+                try :
+                    soloTweet = status._json
+                    date = self.setDateT(soloTweet['created_at'])  # On calcule et on stocke la date du tweet
+                    content = soloTweet['full_text']  # On stocke le contenu du tweet
+                    screen_name = api.get_user(ids[i]).screen_name # On stocke le screen_name de propriétaire du tweet
+                    res = self.indexFollower(listFollowers, ids[i])
 
-                if next(iter(res)):
-                    # Si on ne connait pas le follower :
-                    listFollowers.append(follower.Follower(ids[i], screen_name))
-                    # On crée et on ajoute le follower
-                    listFollowers[res[True]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
-                    # On crée et on ajoute le tweet
-                else:
-                    # Si on connait pas follower :
-                    listFollowers[res[False]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
-                    # On crée et on ajoute le tweet
+                    if next(iter(res)):
+                        # Si on ne connait pas le follower :
+                        listFollowers.append(follower.Follower(ids[i], screen_name))
+                        # On crée et on ajoute le follower
+                        listFollowers[res[True]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
+                        # On crée et on ajoute le tweet
+                    else:
+                        # Si on connait pas follower :
+                        listFollowers[res[False]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
+                        # On crée et on ajoute le tweet
+                except tweepy.TweepError as e:
+                    print("Going to sleep:", e)
+                    time.sleep(60)
 
         return listFollowers
 

@@ -4,7 +4,7 @@ import mysql.connector
 mydb = mysql.connector.connect(
     host='localhost',
     user='root',
-    passwd='password',
+    passwd='root',
     database='twitterdb')
 
 mycursor = mydb.cursor()
@@ -35,24 +35,23 @@ class DataBase :
         mycursor.commit()
 
         createFollowerTable = "CREATE TABLE follower (" \
-                                "idF VARCHAR(255)," \
-                                "screen_name varchar(255)," \
-                                "weight int(10)," \
-                                "PRIMARY KEY(idF)" \
+                                "screen_name VARCHAR(255)," \
+                                "name varchar(255)," \
+                                "PRIMARY KEY(screen_name)" \
                               ")"
 
-        createTweetTable = "CREATE TABLE tweet (" \
-                            "idT VARCHAR(255)," \
-                            "idF VARCHAR(255)," \
-                            "type VARCHAR(255)," \
-                            "content VARCHAR(140)," \
-                            "weight INTEGER(10)," \
-                            "PRIMARY KEY(idT)," \
-                            "FOREIGN KEY (idF) REFERENCES follower(idF)" \
-                           ")"
+        #createTweetTable = "CREATE TABLE tweet (" \
+        #                    "idT VARCHAR(255)," \
+        #                    "idF VARCHAR(255)," \
+        #                    "type VARCHAR(255)," \
+        #                    "content VARCHAR(140)," \
+        #                    "weight INTEGER(10)," \
+        #                    "PRIMARY KEY(idT)," \
+        #                    "FOREIGN KEY (idF) REFERENCES follower(idF)" \
+        #                   ")"
 
         mycursor.execute(createFollowerTable)
-        mycursor.execute(createTweetTable)
+        #mycursor.execute(createTweetTable)
 
         mydb.commit()
 
