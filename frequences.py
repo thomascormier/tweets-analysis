@@ -39,7 +39,7 @@ class Frequences :
 
     def nToWeekDay(self,numHour):
         numWeekday = numHour//24
-        WeekdayDic = {0 :"lundi", 1 : "mardi",2: "mercredi",3: "jeudi",4: "vendredi",5: "samedi",6: "dimanche"}
+        WeekdayDic = {0 :"lundi   ", 1 : "mardi   ",2: "mercredi",3: "jeudi   ",4: "vendredi",5: "samedi  ",6: "dimanche"}
         return WeekdayDic[numWeekday]
 
     def hBefore(self,numHour):
@@ -48,8 +48,8 @@ class Frequences :
     def hAfter(self,numHour):
         return numHour%24+1
 
-    def pourcentageActivite(self):
-        return float(ActiviteParHeure[hmax1]) / float(sum(ActiviteParHeure))
+    def pourcentageActivite(self,hmax):
+        return (ActiviteParHeure[hmax] / sommeActivite)*100
 
 freq1= Frequences()
 
@@ -68,11 +68,37 @@ for activite in ListeDActivites:
     a = activite[0]*24+activite[1]
     ActiviteParHeure[a]+=1
 
+sommeActivite = float(sum(ActiviteParHeure))
+
+
+for i in range(5):
+    hmax = ActiviteParHeure.index(max(ActiviteParHeure))
+    print(freq1.pourcentageActivite(hmax), "% :",freq1.nToWeekDay(hmax), "(", freq1.hBefore(hmax), "-", freq1.hAfter(hmax), "))")
+    del ActiviteParHeure[hmax]
 
 
 hmax1 = ActiviteParHeure.index(max(ActiviteParHeure))
-print("\nL'heure d'activité maximale est la", hmax1, "i-ème de la semaine.")
-print("C'est à dire le", freq1.nToWeekDay(hmax1), "entre", freq1.hBefore(hmax1), "h et", freq1.hAfter(hmax1), "h.")
-print("La semaine dernière, cette période représentait", freq1.pourcentageActivite(),"% de l'activité de vos Followers.")
+print("\nLa période d'activité maximale est le", freq1.nToWeekDay(hmax1), "entre", freq1.hBefore(hmax1), "h et", freq1.hAfter(hmax1), "h.")
+print("La semaine dernière, cette période représentait", freq1.pourcentageActivite(hmax1),"% de l'activité de vos Followers.")
 
+
+
+del ActiviteParHeure[hmax1]
 hmax2 = ActiviteParHeure.index(max(ActiviteParHeure))
+print("\nLa période d'activité maximale est le", freq1.nToWeekDay(hmax2), "entre", freq1.hBefore(hmax2), "h et", freq1.hAfter(hmax2), "h.")
+print("La semaine dernière, cette période représentait", freq1.pourcentageActivite(hmax2),"% de l'activité de vos Followers.")
+
+del ActiviteParHeure[hmax2]
+hmax3 = ActiviteParHeure.index(max(ActiviteParHeure))
+print("\nLa période d'activité maximale est le", freq1.nToWeekDay(hmax3), "entre", freq1.hBefore(hmax3), "h et", freq1.hAfter(hmax3), "h.")
+print("La semaine dernière, cette période représentait", freq1.pourcentageActivite(hmax3),"% de l'activité de vos Followers.")
+
+del ActiviteParHeure[hmax3]
+hmax4 = ActiviteParHeure.index(max(ActiviteParHeure))
+print("\nLa période d'activité maximale est le", freq1.nToWeekDay(hmax4), "entre", freq1.hBefore(hmax4), "h et", freq1.hAfter(hmax4), "h.")
+print("La semaine dernière, cette période représentait", freq1.pourcentageActivite(hmax4),"% de l'activité de vos Followers.")
+
+del ActiviteParHeure[hmax4]
+hmax5 = ActiviteParHeure.index(max(ActiviteParHeure))
+print("\nLa période d'activité maximale est le", freq1.nToWeekDay(hmax5), "entre", freq1.hBefore(hmax5), "h et", freq1.hAfter(hmax5), "h.")
+print("La semaine dernière, cette période représentait", freq1.pourcentageActivite(hmax5),"% de l'activité de vos Followers.")
