@@ -41,7 +41,7 @@ class API :
         :return: Une liste des followers d'un compte
         """
         listIDs = []
-        for ids in tweepy.Cursor(api.followers_ids, id=idAccount).items(5):
+        for ids in tweepy.Cursor(api.followers_ids, id=idAccount).items(15):
             listIDs.append(ids)
         return listIDs
 
@@ -50,7 +50,7 @@ class API :
         listFollowers = []
         for i in range(len(ids)):
             # Pour chaque follower sélectionné
-            for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name,tweet_mode='extended').items(3):
+            for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name,tweet_mode='extended').items(1):
                 # On parcoure ces 2 derniers tweets pour récupérer les infos suivantes :
                 soloTweet = status._json
                 date = self.setDateT(soloTweet['created_at'])  # On calcule et on stocke la date du tweet
@@ -108,6 +108,7 @@ class CSVFile:
                     else:
                         type = 'T'
                     data.append([type, str(tweet.date)])
+                    time.sleep(10)
             a.writerows(data)
             print(data)
             fp.close
@@ -118,7 +119,7 @@ class CSVFile:
             a = csv.writer(fp, delimiter=',')
             for follower in TwitterAPI.listFollowers:
                 data.append([follower.screen_name])
-                time.sleep(0.2)
+                time.sleep(120)
             a.writerows(data)
             print(data)
             fp.close
@@ -134,6 +135,7 @@ class CSVFile:
                     else:
                         type = 'T'
                     data.append([follower.screen_name,type, str(tweet.date)])
+                    time.sleep(10)
             a.writerows(data)
             print(data)
             fp.close
@@ -141,12 +143,12 @@ class CSVFile:
 #############################################EXECUTION#############################################
 
 
-BasicCSV = CSVFile()
+#BasicCSV = CSVFile()
 #BasicCSV.writeBasicCSV()
 
 
 FollowerdataCSV = CSVFile()
 FollowerdataCSV.writeFollowerCSV()
 
-TweetdataCSV = CSVFile()
+#TweetdataCSV = CSVFile()
 #TweetdataCSV.writeTweetCSV()
