@@ -39,7 +39,7 @@ class API :
     def __init__(self,idAccount):
         self.idAccount = idAccount
         #self.FollowersIDs = self.getFollowersIDs(idAccount)
-        #self.listFollowers = self.getlistFollowers()
+        self.listFollowers = self.getlistFollowers()
 
     #def getFollowersIDs(self, idAccount):
     #    """
@@ -81,14 +81,15 @@ class API :
         db = DataBase()
         followers = db.getFollowersdb()
         listFollowers = []
-        for follower in followers :
-            tweets = db.getTweetsdb(follower[0])#follower[0]=id du follower
+        for fol in followers :
+            print("oui"+fol[1])
+            tweets = db.getTweetsdb(fol[0])#follower[0]=id du follower
             for tweetSolo in tweets:
-                res = self.indexFollower(listFollowers, follower[0])
+                res = self.indexFollower(listFollowers, fol[0])
 
                 if next(iter(res)):
                     # Si on ne connait pas le follower :
-                    listFollowers.append(follower.Follower(follower[0], follower[1]))
+                    listFollowers.append(follower.Follower(fol[0], fol[1]))
                     # On crée et on ajoute le follower
                     listFollowers[res[True]].addTweet(tweet.Tweet(tweetSolo[2], tweetSolo[3], tokenizer.getWeight(tweetSolo[3])))
                     # On crée et on ajoute le tweet
@@ -117,7 +118,9 @@ class API :
         d = d + timedelta(hours=1)
         return d
 
-#TwitterAPI = API("_agricool")
+TwitterAPI = API("_agricool")
+for f in TwitterAPI.listFollowers:
+    print(f.screen_name)
 
 ##########################################################################################
 
