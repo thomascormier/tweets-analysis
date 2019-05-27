@@ -65,7 +65,7 @@ def save_followers_to_db(user_name, data,db):
     :param data: data recieved from twitter
     :return: None
     """
-    #db.createDB() !!!!A DECOMMENTER !!!! CA DROP LES TABLES ATTENTION
+    db.createDB() #!!!!ATTENTION !!!! CA DROP LES TABLES ATTENTION
     for profile_data in data:
         id = profile_data._json["id"]
         screen_name = profile_data._json["screen_name"]
@@ -79,7 +79,7 @@ def insertTweet(db):
     followers = []
     i =0
     for row in records:
-        if (i>2):
+        if (i>100):
             break
         tweets = getTweetsFollower(row[0])
         for tweet in tweets:
@@ -127,9 +127,6 @@ if __name__ == '__main__':
 
     db= DataBase()
 
-    #followers = get_followers("_agricool")
-    #save_followers_to_db("_agricool", followers,db)
-    #insertTweet(db)
-    rec = db.getTweetsdb("100047157")
-    for row1 in rec:
-        print(row1[3])
+    followers = get_followers("_agricool")
+    save_followers_to_db("_agricool", followers,db)
+    insertTweet(db)
