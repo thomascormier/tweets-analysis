@@ -6,6 +6,7 @@ import tweepy
 import logging
 import csv
 import time
+from testGetAll import *
 
 try:
     import json
@@ -30,54 +31,74 @@ CONSUMER_SECRET = "JuFRZeTaWVG48GYALBRDuaJHJr5LQVqBsFyDyyDxaUVYhu0rMz"
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 
-api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True, compression=True)
+#api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True, compression=True)
 
 ##########################################################################################
 
 class API :
     def __init__(self,idAccount):
         self.idAccount = idAccount
-        self.FollowersIDs = self.getFollowersIDs(idAccount)
-        self.listFollowers = self.getlistFollowers()
+        #self.FollowersIDs = self.getFollowersIDs(idAccount)
+        #self.listFollowers = self.getlistFollowers()
 
-    def getFollowersIDs(self, idAccount):
-        """
-        :param idAccount: La compte dont on souhaite récupérer les followers
-        :return: Une liste des followers d'un compte
-        """
-        listIDs = []
-        for ids in tweepy.Cursor(api.followers_ids, id=idAccount).items(0):
-            listIDs.append(ids)
-        return listIDs
+    #def getFollowersIDs(self, idAccount):
+    #    """
+    #    :param idAccount: La compte dont on souhaite récupérer les followers
+    #    :return: Une liste des followers d'un compte
+    #    """
+    #    listIDs = []
+    #    for ids in tweepy.Cursor(api.followers_ids, id=idAccount).items(0):
+    #        listIDs.append(ids)
+    #    return listIDs
+
+    #def getlistFollowers(self):
+    #    ids = self.FollowersIDs
+    #    listFollowers = []
+    #    for i in range(len(ids)):
+    #        # Pour chaque follower sélectionné
+    #        for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name,tweet_mode='extended').items(0):
+    #            # On parcoure ces 2 derniers tweets pour récupérer les infos suivantes :
+    #            soloTweet = status._json
+    #            date = self.setDateT(soloTweet['created_at'])  # On calcule et on stocke la date du tweet
+    #            content = soloTweet['full_text']  # On stocke le contenu du tweet
+    #            screen_name = api.get_user(ids[i]).screen_name # On stocke le screen_name de propriétaire du tweet
+    #            res = self.indexFollower(listFollowers, ids[i])
+    #
+    #            if next(iter(res)):
+    #                # Si on ne connait pas le follower :
+    #                listFollowers.append(follower.Follower(ids[i], screen_name))
+    #                # On crée et on ajoute le follower
+    #                listFollowers[res[True]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
+    #                # On crée et on ajoute le tweet
+    #            else:
+    #                # Si on connait pas follower :
+    #                listFollowers[res[False]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
+    #                # On crée et on ajoute le tweet
+    #
+    #    return listFollowers
 
     def getlistFollowers(self):
-        ids = self.FollowersIDs
+        db = DataBase()
+        followers = db.getFollowersdb()
         listFollowers = []
-        for i in range(len(ids)):
-            # Pour chaque follower sélectionné
-            for status in tweepy.Cursor(api.user_timeline, screen_name=api.get_user(ids[i]).screen_name,tweet_mode='extended').items(0):
-                # On parcoure ces 2 derniers tweets pour récupérer les infos suivantes :
-                soloTweet = status._json
-                date = self.setDateT(soloTweet['created_at'])  # On calcule et on stocke la date du tweet
-                content = soloTweet['full_text']  # On stocke le contenu du tweet
-                screen_name = api.get_user(ids[i]).screen_name # On stocke le screen_name de propriétaire du tweet
-                res = self.indexFollower(listFollowers, ids[i])
+        for follower in followers :
+            tweets = db.getTweetsdb(follower[0])#follower[0]=id du follower
+            for tweetSolo in tweets:
+                res = self.indexFollower(listFollowers, follower[0])
 
                 if next(iter(res)):
                     # Si on ne connait pas le follower :
-                    listFollowers.append(follower.Follower(ids[i], screen_name))
+                    listFollowers.append(follower.Follower(follower[0], follower[1]))
                     # On crée et on ajoute le follower
-                    listFollowers[res[True]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
+                    listFollowers[res[True]].addTweet(tweet.Tweet(tweetSolo[2], tweetSolo[3], tokenizer.getWeight(tweetSolo[3])))
                     # On crée et on ajoute le tweet
                 else:
                     # Si on connait pas follower :
-                    listFollowers[res[False]].addTweet(tweet.Tweet(date, content, tokenizer.getWeight(content)))
+                    listFollowers[res[False]].addTweet(tweet.Tweet(tweetSolo[2], tweetSolo[3], tokenizer.getWeight(tweetSolo[3])))
                     # On crée et on ajoute le tweet
-
         return listFollowers
 
     def indexFollower(self,listFollowers, id):
-        #res = {}
         for i in range(len(listFollowers)):
             if listFollowers[i].idF == id:  # check if the follower is already in the list
                 res = {False: i}
@@ -100,51 +121,51 @@ class API :
 
 ##########################################################################################
 
-class CSVFile:
-
-
-    def writeBasicCSV(self):
-        data = []
-        with open('BasicData.csv', 'w', newline='') as fp:
-            a = csv.writer(fp, delimiter=',')
-            for follower in TwitterAPI.listFollowers:
-                for tweet in follower.listTweets:
-                    if tweet.content.startswith("RT"):
-                        type = 'RT'
-                    else:
-                        type = 'T'
-                    data.append([type, str(tweet.date)])
-                    time.sleep(10)
-            a.writerows(data)
-            print(data)
-            fp.close
-
-    def writeFollowerCSV(self):
-        data = []
-        with open('ListFollowers.csv', 'w', newline='') as fp:
-            a = csv.writer(fp, delimiter=',')
-            for follower in TwitterAPI.listFollowers:
-                data.append([follower.screen_name])
-                time.sleep(120)
-            a.writerows(data)
-            print(data)
-            fp.close
-
-    def writeTweetCSV(self):
-        data = []
-        with open('ListTweets.csv', 'w', newline='') as fp:
-            a = csv.writer(fp, delimiter=',')
-            for follower in TwitterAPI.listFollowers:
-                for tweet in follower.listTweets:
-                    if tweet.content.startswith("RT"):
-                        type = 'RT'
-                    else:
-                        type = 'T'
-                    data.append([follower.screen_name,type, str(tweet.date)])
-                    time.sleep(10)
-            a.writerows(data)
-            print(data)
-            fp.close
+#class CSVFile:
+#
+#
+#    def writeBasicCSV(self):
+#        data = []
+#        with open('BasicData.csv', 'w', newline='') as fp:
+#            a = csv.writer(fp, delimiter=',')
+#            for follower in TwitterAPI.listFollowers:
+#                for tweet in follower.listTweets:
+#                    if tweet.content.startswith("RT"):
+#                        type = 'RT'
+#                    else:
+#                        type = 'T'
+#                    data.append([type, str(tweet.date)])
+#                    time.sleep(10)
+#            a.writerows(data)
+#            print(data)
+#            fp.close
+#
+#    def writeFollowerCSV(self):
+#        data = []
+#        with open('ListFollowers.csv', 'w', newline='') as fp:
+#            a = csv.writer(fp, delimiter=',')
+#            for follower in TwitterAPI.listFollowers:
+#                data.append([follower.screen_name])
+#                time.sleep(120)
+#            a.writerows(data)
+#            print(data)
+#            fp.close
+#
+#    def writeTweetCSV(self):
+#        data = []
+#        with open('ListTweets.csv', 'w', newline='') as fp:
+#            a = csv.writer(fp, delimiter=',')
+#            for follower in TwitterAPI.listFollowers:
+#                for tweet in follower.listTweets:
+#                    if tweet.content.startswith("RT"):
+#                        type = 'RT'
+#                    else:
+#                        type = 'T'
+#                    data.append([follower.screen_name,type, str(tweet.date)])
+#                    time.sleep(10)
+#            a.writerows(data)
+#            print(data)
+#            fp.close
 
 #BasicCSV = CSVFile()
 #BasicCSV.writeBasicCSV()
